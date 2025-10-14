@@ -1,0 +1,29 @@
+export interface GlobalCryptoData {
+  data: {
+    active_cryptocurrencies: number
+    upcoming_icos: number
+    ongoing_icos: number
+    ended_icos: number
+    markets: number
+
+    total_market_cap: Record<string, number>
+    total_volume: Record<string, number>
+
+    market_cap_percentage: {
+      btc: number
+      eth: number
+      usdt: number
+      bnb: number
+      sol: number
+      usdc: number
+      xrp: number
+      steth: number
+      doge: number
+      ada: number
+      [key: string]: number
+    }
+
+    market_cap_change_percentage_24h_usd: number
+    updated_at: number
+  }
+}
