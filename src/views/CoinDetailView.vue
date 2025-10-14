@@ -7,6 +7,8 @@ import CoinStatistics from '@/components/CoinStatistics.vue'
 import CoinDescription from '@/components/CoinDescription.vue'
 import CoinMarketData from '@/components/CoinMarketData.vue'
 import CoinSocialLinks from '@/components/CoinSocialLinks.vue'
+import { formatPercentage } from '@/utils/formatPercentage'
+import { formatPrice } from '@/utils/formatPrice'
 
 
 interface Props {
@@ -20,25 +22,7 @@ const cryptoStore = useCryptoStore()
 
 const coinId = computed(() => props.id || route.params.id as string)
 
-// Format price with currency symbol
-const formatPrice = (price: number | undefined): string => {
-  if (!price) return 'N/A'
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: price < 1 ? 6 : 2,
-    maximumFractionDigits: price < 1 ? 6 : 2,
-  }).format(price)
-}
 
-// Format percentage with color
-const formatPercentage = (percentage: number): { value: string; color: string } => {
-  const formattedValue = `${percentage >= 0 ? '+' : ''}${percentage.toFixed(2)}%`
-  const color = percentage >= 0 ? 'success' : 'error'
-  return { value: formattedValue, color }
-}
-
-// Fetch coin details when component mounts or coin ID changes
 watch(coinId, (newId) => {
   if (newId) {
     cryptoStore.fetchCoinDetails(newId)
@@ -71,7 +55,6 @@ const goBack = () => {
       <v-progress-circular indeterminate color="primary" size="64" />
     </div>
 
-    <!-- Error State -->
     <v-alert v-else-if="error" type="error" variant="tonal" class="mb-4">
       <div class="d-flex align-center justify-space-between">
         <span>Failed to load coin details: {{ error }}</span>
@@ -81,9 +64,7 @@ const goBack = () => {
       </div>
     </v-alert>
 
-    <!-- Coin Details Content -->
     <div v-else-if="coinData">
-      <!-- Header Section -->
       <v-card class="mb-6" elevation="8" rounded="xl">
         <v-card-text class="pa-6">
           <v-btn @click="goBack" variant="text" prepend-icon="mdi-arrow-left" class="mb-4">
@@ -130,7 +111,6 @@ const goBack = () => {
             </div>
           </div>
 
-          <!-- Categories -->
           <div v-if="coinData.categories.length" class="mb-4">
             <div class="text-subtitle-2 mb-2 text-medium-emphasis">Categories</div>
             <div class="d-flex flex-wrap gap-2">
@@ -143,33 +123,24 @@ const goBack = () => {
         </v-card-text>
       </v-card>
 
-      <!-- Main Content Grid -->
       <v-row>
-        <!-- Left Column -->
         <v-col cols="12" lg="8">
-          <!-- Price Chart Component -->
           <CoinPriceChart v-if="coinData" :coin-id="coinData.id" class="mb-6" />
 
-          <!-- Description Component -->
           <CoinDescription v-if="coinData.description.en" :description="coinData.description.en" :name="coinData.name"
             class="mb-6" />
         </v-col>
 
-        <!-- Right Column -->
         <v-col cols="12" lg="4">
-          <!-- Market Data Component -->
           <CoinMarketData :market-data="coinData.market_data" :name="coinData.name" class="mb-6" />
 
-          <!-- Statistics Component -->
           <CoinStatistics :coin-data="coinData" class="mb-6" />
 
-          <!-- Social Links Component -->
           <CoinSocialLinks :links="coinData.links" :name="coinData.name" />
         </v-col>
       </v-row>
     </div>
 
-    <!-- No Data State -->
     <div v-else class="text-center pa-8">
       <v-icon size="64" color="grey" class="mb-4">mdi-currency-btc</v-icon>
       <h3 class="text-h6 mb-2">No coin data available</h3>
