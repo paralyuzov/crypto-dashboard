@@ -10,9 +10,13 @@ import { mdi } from 'vuetify/iconsets/mdi'
 
 import App from './App.vue'
 import router from './router'
+import { VPie } from 'vuetify/labs/VPie'
 
 const vuetify = createVuetify({
-  components,
+  components: {
+    VPie,
+    ...components,
+  },
   directives,
   icons: {
     defaultSet: 'mdi',

@@ -1,11 +1,17 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import AppHeader from './components/AppHeader.vue';
+
+
+</script>
+
+
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
-</template>
+  <div class="bg-gray-200">
+    <AppHeader />
+    <div class="max-w-[1440px] mx-auto pa-2">
+      <router-view />
+    </div>
+  </div>
 
-<style scoped></style>
+</template>
