@@ -34,23 +34,23 @@ const navigateToCoin = (coinId: string) => {
 </script>
 
 <template>
-  <div
-    class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border-gray-200/50 overflow-hidden"
-  >
-    <div class="flex justify-between items-center bg-gray-200/60 p-2">
-      <h2 class="text-lg font-semibold text-gray-800 flex items-center px-4">Market Overview</h2>
+  <v-card class="overflow-hidden" elevation="4" rounded="xl">
+    <v-card-title class="d-flex justify-space-between align-center pa-4 bg-grey-lighten-4">
+      <h2 class="text-h6 font-weight-medium">Market Overview</h2>
       <v-btn
         @click="toggleCoinsView"
         :prepend-icon="buttonIcon"
         density="compact"
         :text="buttonText"
-        color="blue-lighten-1"
-        outlined
+        color="primary"
+        variant="outlined"
+        size="small"
       >
       </v-btn>
-    </div>
-    <div class="hidden lg:block overflow-x-auto">
-      <table class="w-full">
+    </v-card-title>
+
+    <div class="d-none d-lg-block" style="overflow-x: auto;">
+      <table style="width: 100%; min-width: 800px;">
         <thead class="bg-gray-50/80 backdrop-blur-sm">
           <tr>
             <th
@@ -126,7 +126,6 @@ const navigateToCoin = (coinId: string) => {
       </table>
     </div>
 
-    <!-- Mobile view with Vuetify classes -->
     <div class="d-lg-none pa-4">
       <v-card
         v-for="coin in props.coins"
@@ -138,7 +137,6 @@ const navigateToCoin = (coinId: string) => {
         hover
       >
         <v-card-text class="pa-4">
-          <!-- Top row: Coin info and price -->
           <div class="d-flex align-center justify-space-between mb-4">
             <div class="d-flex align-center">
               <div class="position-relative mr-3">
@@ -176,7 +174,6 @@ const navigateToCoin = (coinId: string) => {
             </div>
           </div>
 
-          <!-- Bottom row: Key metrics -->
           <v-divider class="mb-3"></v-divider>
           <v-row dense>
             <v-col cols="6">
@@ -200,19 +197,12 @@ const navigateToCoin = (coinId: string) => {
       </v-card>
     </div>
 
-    <div v-if="!props.coins.length" class="text-center py-12">
-      <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-          />
-        </svg>
+    <v-card-text v-if="!props.coins.length" class="text-center py-12">
+      <div class="d-flex justify-center mb-4">
+        <v-icon size="64" color="grey-lighten-1">mdi-chart-line</v-icon>
       </div>
-      <h3 class="text-sm font-medium text-gray-900 mb-1">No data available</h3>
-      <p class="text-sm text-gray-500">Cryptocurrency data will appear here when loaded.</p>
-    </div>
-  </div>
+      <h3 class="text-subtitle-1 font-weight-medium mb-2">No data available</h3>
+      <p class="text-body-2 text-medium-emphasis">Cryptocurrency data will appear here when loaded.</p>
+    </v-card-text>
+  </v-card>
 </template>
