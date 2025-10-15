@@ -51,7 +51,10 @@ const searchSuggestions = computed(() => {
 
   return searchResults.value.coins
     .filter((coin: SearchCoin) => coin.market_cap_rank !== null)
-    .sort((a: SearchCoin, b: SearchCoin) => (a.market_cap_rank || 999999) - (b.market_cap_rank || 999999))
+    .sort(
+      (a: SearchCoin, b: SearchCoin) =>
+        (a.market_cap_rank || 999999) - (b.market_cap_rank || 999999),
+    )
     .slice(0, 8)
 })
 
@@ -76,9 +79,7 @@ const handleSearchFocus = () => {
 }
 
 const handleSearchBlur = () => {
-  setTimeout(() => {
-    isSearchActive.value = false
-  }, 200)
+  // Removed timeout since v-menu handles this better
 }
 
 const handleKeyDown = (event: KeyboardEvent) => {
@@ -90,67 +91,111 @@ const handleKeyDown = (event: KeyboardEvent) => {
 
 <template>
   <div class="crypto-search position-relative">
-    <v-text-field v-model="searchQuery" @focus="handleSearchFocus" @blur="handleSearchBlur" @keydown="handleKeyDown"
-      placeholder="Search cryptocurrencies..." prepend-inner-icon="mdi-magnify" variant="outlined" density="compact"
-      hide-details clearable class="search-field" :loading="searchLoading" />
-
-    <v-card
-      v-if="isSearchActive && (searchSuggestions.length > 0 || searchError || (searchQuery.trim().length >= 2 && !searchLoading))"
-      class="search-dropdown position-absolute" elevation="8">
-      <div v-if="searchLoading" class="pa-4 text-center">
-        <v-progress-circular indeterminate size="32" color="primary" class="mb-2" />
-        <p class="text-body-2 text-medium-emphasis">Searching...</p>
-      </div>
-
-      <div v-else-if="searchError" class="pa-4 text-center">
-        <v-icon color="error" size="32" class="mb-2">mdi-alert-circle</v-icon>
-        <p class="text-body-2 text-error mb-2">Search failed</p>
-        <v-btn @click="performSearch(searchQuery)" size="small" color="primary" variant="outlined">
-          Try Again
-        </v-btn>
-      </div>
-
-      <template v-else-if="searchSuggestions.length > 0">
-        <div class="pa-2">
-          <div class="text-caption text-medium-emphasis pa-2 font-weight-medium">
-            Cryptocurrencies ({{ searchSuggestions.length }})
-          </div>
-        </div>
-
-        <v-list density="compact" class="pa-0">
-          <v-list-item v-for="coin in searchSuggestions" :key="coin.id" @click="navigateToCoin(coin.id)"
-            class="search-result-item" lines="one">
-            <template v-slot:prepend>
-              <v-avatar size="32" class="mr-3">
-                <v-img :src="coin.thumb" :alt="coin.name" />
-              </v-avatar>
-            </template>
-
-            <v-list-item-title>
-              <div class="d-flex align-center justify-space-between">
-                <div class="d-flex align-center">
-                  <span class="font-weight-medium">{{ coin.name }}</span>
-                  <span class="text-medium-emphasis ml-2 text-uppercase">
-                    {{ coin.symbol }}
-                  </span>
-                </div>
-                <v-chip v-if="coin.market_cap_rank" size="x-small" variant="outlined" color="primary">
-                  #{{ coin.market_cap_rank }}
-                </v-chip>
-              </div>
-            </v-list-item-title>
-          </v-list-item>
-        </v-list>
+    <v-menu
+      v-model="isSearchActive"
+      :close-on-content-click="false"
+      location="bottom"
+      offset="4"
+      max-height="400"
+      min-width="100%"
+      class="search-menu"
+    >
+      <template v-slot:activator="{ props }">
+        <v-text-field
+          v-model="searchQuery"
+          @focus="handleSearchFocus"
+          @blur="handleSearchBlur"
+          @keydown="handleKeyDown"
+          placeholder="Search cryptocurrencies..."
+          prepend-inner-icon="mdi-magnify"
+          variant="outlined"
+          density="compact"
+          hide-details
+          clearable
+          class="search-field"
+          :loading="searchLoading"
+          v-bind="props"
+        />
       </template>
 
-      <div v-else-if="searchQuery.trim().length >= 2" class="pa-6 text-center">
-        <v-icon color="grey" size="48" class="mb-3">mdi-magnify</v-icon>
-        <p class="text-body-1 font-weight-medium mb-1">No results found</p>
-        <p class="text-body-2 text-medium-emphasis">
-          Try searching for a different cryptocurrency name or symbol
-        </p>
-      </div>
-    </v-card>
+      <v-card
+        v-if="
+          searchSuggestions.length > 0 ||
+          searchError ||
+          (searchQuery.trim().length >= 2 && !searchLoading)
+        "
+        elevation="8"
+      >
+        <div v-if="searchLoading" class="pa-4 text-center">
+          <v-progress-circular indeterminate size="32" color="primary" class="mb-2" />
+          <p class="text-body-2 text-medium-emphasis">Searching...</p>
+        </div>
+
+        <div v-else-if="searchError" class="pa-4 text-center">
+          <v-icon color="error" size="32" class="mb-2">mdi-alert-circle</v-icon>
+          <p class="text-body-2 text-error mb-2">Search failed</p>
+          <v-btn
+            @click="performSearch(searchQuery)"
+            size="small"
+            color="primary"
+            variant="outlined"
+          >
+            Try Again
+          </v-btn>
+        </div>
+
+        <template v-else-if="searchSuggestions.length > 0">
+          <div class="pa-2">
+            <div class="text-caption text-medium-emphasis pa-2 font-weight-medium">
+              Cryptocurrencies ({{ searchSuggestions.length }})
+            </div>
+          </div>
+
+          <v-list density="compact" class="pa-0">
+            <v-list-item
+              v-for="coin in searchSuggestions"
+              :key="coin.id"
+              @click="navigateToCoin(coin.id)"
+              class="search-result-item"
+              lines="one"
+            >
+              <template v-slot:prepend>
+                <v-avatar size="32" class="mr-3">
+                  <v-img :src="coin.thumb" :alt="coin.name" />
+                </v-avatar>
+              </template>
+
+              <v-list-item-title>
+                <div class="d-flex align-center justify-space-between">
+                  <div class="d-flex align-center">
+                    <span class="font-weight-medium">{{ coin.name }}</span>
+                    <span class="text-medium-emphasis ml-2 text-uppercase">
+                      {{ coin.symbol }}
+                    </span>
+                  </div>
+                  <v-chip
+                    v-if="coin.market_cap_rank"
+                    size="x-small"
+                    variant="outlined"
+                    color="primary"
+                  >
+                    #{{ coin.market_cap_rank }}
+                  </v-chip>
+                </div>
+              </v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </template>
+
+        <div v-else-if="searchQuery.trim().length >= 2" class="pa-6 text-center">
+          <v-icon color="grey" size="48" class="mb-3">mdi-magnify</v-icon>
+          <p class="text-body-1 font-weight-medium mb-1">No results found</p>
+          <p class="text-body-2 text-medium-emphasis">
+            Try searching for a different cryptocurrency name or symbol
+          </p>
+        </div>
+      </v-card>
+    </v-menu>
   </div>
 </template>
 
@@ -166,18 +211,6 @@ const handleKeyDown = (event: KeyboardEvent) => {
 
 .search-field:focus-within {
   transform: scale(1.01);
-}
-
-.search-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  max-height: 400px;
-  overflow-y: auto;
-  margin-top: 4px;
-  border-radius: 8px;
 }
 
 .search-result-item {
@@ -197,27 +230,5 @@ const handleKeyDown = (event: KeyboardEvent) => {
   .crypto-search {
     max-width: 100%;
   }
-
-  .search-dropdown {
-    max-height: 300px;
-  }
-}
-
-/* Custom scrollbar for search results */
-.search-dropdown::-webkit-scrollbar {
-  width: 6px;
-}
-
-.search-dropdown::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.search-dropdown::-webkit-scrollbar-thumb {
-  background: rgba(var(--v-theme-primary), 0.2);
-  border-radius: 3px;
-}
-
-.search-dropdown::-webkit-scrollbar-thumb:hover {
-  background: rgba(var(--v-theme-primary), 0.3);
 }
 </style>

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { useDisplay } from 'vuetify'
 import CryptoSearch from './CryptoSearch.vue'
 
 const router = useRouter()
+const { mobile } = useDisplay()
 
 const goHome = () => {
   router.push('/')
@@ -10,74 +12,42 @@ const goHome = () => {
 </script>
 
 <template>
-  <header class="app-header bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/50 mb-6 pa-4">
-    <div class="d-flex justify-space-between align-center">
-      <div class="d-flex align-center">
-        <h1 @click="goHome" class="text-h4 font-weight-bold text-primary cursor-pointer"
-          style="transition: all 0.2s ease;">
-          CryptoDashboard
-        </h1>
-      </div>
+  <div v-if="mobile" class="pa-3" style="width: 100%; min-height: 80px">
+    <div class="d-flex align-center justify-center mb-3">
+      <h1
+        @click="goHome"
+        class="text-h5 font-weight-bold text-black cursor-pointer"
+        style="transition: all 0.2s ease"
+      >
+        CryptoDashboard
+      </h1>
+    </div>
 
-      <div class="flex-grow-1 d-flex justify-center mx-4">
+    <div class="d-flex justify-center" style="position: relative; z-index: 1">
+      <div style="width: 100%; max-width: 350px">
         <CryptoSearch />
       </div>
+    </div>
+  </div>
 
-      <div class="d-flex align-center gap-2">
-        <v-btn @click="goHome" icon variant="text" size="small" color="primary">
-          <v-icon>mdi-home</v-icon>
-        </v-btn>
+  <div v-else class="d-flex align-center pa-3" style="width: 100%; min-height: 70px">
+    <div class="flex-grow-0" style="min-width: 200px">
+      <h1
+        @click="goHome"
+        class="text-h4 font-weight-bold text-black cursor-pointer"
+        style="transition: all 0.2s ease"
+      >
+        CryptoDashboard
+      </h1>
+    </div>
 
-        <v-btn icon variant="text" size="small" color="primary">
-          <v-icon>mdi-heart-outline</v-icon>
-        </v-btn>
+    <div class="flex-grow-1 d-flex justify-center" style="position: relative; z-index: 1">
+      <div style="max-width: 400px; width: 100%">
+        <CryptoSearch />
       </div>
     </div>
-  </header>
+
+    <div class="flex-grow-0" style="min-width: 200px">
+    </div>
+  </div>
 </template>
-
-<style scoped>
-.app-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.cursor-pointer {
-  cursor: pointer;
-}
-
-.cursor-pointer:hover {
-  opacity: 0.8;
-  transform: scale(1.02);
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  .d-flex.justify-space-between {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: center;
-  }
-
-  .flex-grow-1 {
-    width: 100%;
-    max-width: none;
-  }
-
-  .mx-4 {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .pa-4 {
-    padding: 12px !important;
-  }
-
-  .text-h4 {
-    font-size: 1.25rem !important;
-  }
-}
-</style>

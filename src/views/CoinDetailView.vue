@@ -10,7 +10,6 @@ import CoinSocialLinks from '@/components/CoinSocialLinks.vue'
 import { formatPercentage } from '@/utils/formatPercentage'
 import { formatPrice } from '@/utils/formatPrice'
 
-
 interface Props {
   id: string
 }
@@ -20,14 +19,17 @@ const route = useRoute()
 const router = useRouter()
 const cryptoStore = useCryptoStore()
 
-const coinId = computed(() => props.id || route.params.id as string)
+const coinId = computed(() => props.id || (route.params.id as string))
 
-
-watch(coinId, (newId) => {
-  if (newId) {
-    cryptoStore.fetchCoinDetails(newId)
-  }
-}, { immediate: true })
+watch(
+  coinId,
+  (newId) => {
+    if (newId) {
+      cryptoStore.fetchCoinDetails(newId)
+    }
+  },
+  { immediate: true },
+)
 
 onMounted(() => {
   if (coinId.value) {
@@ -51,16 +53,14 @@ const goBack = () => {
 
 <template>
   <v-container class="pa-4">
-    <div v-if="loading" class="d-flex justify-center align-center" style="min-height: 400px;">
+    <div v-if="loading" class="d-flex justify-center align-center" style="min-height: 400px">
       <v-progress-circular indeterminate color="primary" size="64" />
     </div>
 
     <v-alert v-else-if="error" type="error" variant="tonal" class="mb-4">
       <div class="d-flex align-center justify-space-between">
         <span>Failed to load coin details: {{ error }}</span>
-        <v-btn @click="goBack" variant="outlined" size="small">
-          Go Back
-        </v-btn>
+        <v-btn @click="goBack" variant="outlined" size="small"> Go Back </v-btn>
       </div>
     </v-alert>
 
@@ -92,18 +92,23 @@ const goBack = () => {
                   <div class="text-h5 font-weight-bold">
                     {{ formatPrice(coinData.market_data.current_price.usd) }}
                   </div>
-                  <div v-if="priceChange24h" class="text-body-1 font-weight-medium"
-                    :class="`text-${priceChange24h.color}`">
+                  <div
+                    v-if="priceChange24h"
+                    class="text-body-1 font-weight-medium"
+                    :class="`text-${priceChange24h.color}`"
+                  >
                     {{ priceChange24h.value }} (24h)
                   </div>
                 </div>
 
                 <div class="">
-                  <v-chip v-if="coinData.sentiment_votes_up_percentage"
-                    :color="coinData.sentiment_votes_up_percentage > 50 ? 'success' : 'error'" variant="flat"
+                  <v-chip
+                    v-if="coinData.sentiment_votes_up_percentage"
+                    :color="coinData.sentiment_votes_up_percentage > 50 ? 'success' : 'error'"
+                    variant="flat"
                     size="small"
                     density="default"
-                    >
+                  >
                     {{ coinData.sentiment_votes_up_percentage.toFixed(1) }}% Bullish
                   </v-chip>
                 </div>
@@ -114,8 +119,13 @@ const goBack = () => {
           <div v-if="coinData.categories.length" class="mb-4">
             <div class="text-subtitle-2 mb-2 text-medium-emphasis">Categories</div>
             <div class="d-flex flex-wrap gap-2">
-              <v-chip v-for="category in coinData.categories.slice(0, 5)" :key="category" size="small"
-                variant="outlined" color="primary">
+              <v-chip
+                v-for="category in coinData.categories.slice(0, 5)"
+                :key="category"
+                size="small"
+                variant="outlined"
+                color="primary"
+              >
                 {{ category }}
               </v-chip>
             </div>
@@ -123,16 +133,26 @@ const goBack = () => {
         </v-card-text>
       </v-card>
 
+      <div class="mb-6">
+        <CoinPriceChart v-if="coinData" :coin-id="coinData.id" />
+      </div>
+
       <v-row>
         <v-col cols="12" lg="8">
-          <CoinPriceChart v-if="coinData" :coin-id="coinData.id" class="mb-6" />
-
-          <CoinDescription v-if="coinData.description.en" :description="coinData.description.en" :name="coinData.name"
-            class="mb-6" />
+          <CoinDescription
+            v-if="coinData.description.en"
+            :description="coinData.description.en"
+            :name="coinData.name"
+            class="mb-6"
+          />
         </v-col>
 
         <v-col cols="12" lg="4">
-          <CoinMarketData :market-data="coinData.market_data" :name="coinData.name" class="mb-6" />
+          <CoinMarketData
+            :market-data="coinData.market_data"
+            :name="coinData.name"
+            class="mb-6 flex-shrink-0"
+          />
 
           <CoinStatistics :coin-data="coinData" class="mb-6" />
 
@@ -147,9 +167,7 @@ const goBack = () => {
       <p class="text-body-2 text-medium-emphasis mb-4">
         The requested cryptocurrency could not be found.
       </p>
-      <v-btn @click="goBack" color="primary" variant="outlined">
-        Go Back
-      </v-btn>
+      <v-btn @click="goBack" color="primary" variant="outlined"> Go Back </v-btn>
     </div>
   </v-container>
 </template>

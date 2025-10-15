@@ -13,6 +13,9 @@ import router from './router'
 import { VPie } from 'vuetify/labs/VPie'
 
 const vuetify = createVuetify({
+  theme: {
+    defaultTheme: 'light',
+  },
   components: {
     VPie,
     ...components,

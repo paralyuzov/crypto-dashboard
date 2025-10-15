@@ -5,11 +5,6 @@ import { useCryptoStore } from '@/stores/crypto'
 
 const cryptoStore = useCryptoStore()
 const { mobile } = useDisplay()
-
-const legendConfig = computed(() => ({
-  position: mobile.value ? 'bottom' as const : 'right' as const
-}))
-
 const colors = [
   '#F7931A',
   '#627EEA',
@@ -23,7 +18,7 @@ const colors = [
   '#0033AD',
 ]
 
-const chartSize = computed(() => mobile.value ? 280 : 400)
+const chartSize = computed(() => (mobile.value ? 280 : 400))
 
 const items = computed(() => {
   if (!cryptoStore.globalCryptoData?.data?.market_cap_percentage) {
@@ -52,32 +47,48 @@ onMounted(() => {
 </script>
 
 <template>
-  <v-container class="flex-fill flex-column align-start justify-center" :class="{ 'pa-2': mobile }">
-    <div class="mb-6">
-      <h3 class="text-h5 text-center mb-2" :class="{ 'text-h6': mobile }">Cryptocurrency Market Cap Distribution</h3>
+  <v-container fluid>
+    <v-container>
+      <h3 class="text-h5 text-center mb-2" :class="{ 'text-h6': mobile }">
+        Cryptocurrency Market Cap Distribution
+      </h3>
       <p class="text-body-2 text-center text-medium-emphasis">
         Market dominance by cryptocurrency (%)
       </p>
-    </div>
+    </v-container>
 
     <v-sheet class="rounded-xl elevation-2" elevation="6" rounded="xl">
-      <v-progress-circular v-if="cryptoStore.loading" indeterminate color="primary" size="64"
-        class="d-block mx-auto"></v-progress-circular>
+      <v-progress-circular
+        v-if="cryptoStore.loading"
+        indeterminate
+        color="primary"
+        size="64"
+        class="d-block mx-auto"
+      ></v-progress-circular>
 
       <v-alert v-else-if="cryptoStore.error" type="error" variant="tonal" class="mb-4">
         Failed to load market data: {{ cryptoStore.error }}
       </v-alert>
 
-      <v-pie v-else-if="items.length > 0" :items="items" :legend="legendConfig" :tooltip="{
-        subtitleFormat: (s) => `${s.value.toFixed(2)}% market dominance`
-      }" inner-cut="60" :size="chartSize" :animation="{ duration: 300, easing: 'easeInCubic' }" hide-slice
-        density="comfortable" :reveal="{ duration: 3000 }" :class="mobile ? 'rounded-xl pa-3' : 'rounded-xl pa-6'">
+      <v-pie
+        v-else-if="items.length > 0"
+        :items="items"
+        :legend="{ position: 'right' }"
+        :tooltip="{
+          subtitleFormat: (s) => `${s.value.toFixed(2)}% market dominance`,
+        }"
+        inner-cut="60"
+        :size="chartSize"
+        :animation="{ duration: 300, easing: 'easeInCubic' }"
+        hide-slice
+        density="comfortable"
+        :reveal="{ duration: 3000 }"
+        class="d-flex justify-evenly align-center pa-4"
+      >
         <template v-slot:legend-text="{ item }">
           <div class="d-flex ga-2 align-center">
             <div class="font-weight-medium">{{ item.title }}</div>
-            <div class="ml-auto font-weight-bold">
-              {{ item.value.toFixed(2) }}%
-            </div>
+            <div class="ml-auto font-weight-bold">{{ item.value.toFixed(2) }}%</div>
           </div>
         </template>
       </v-pie>

@@ -1,16 +1,25 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useCryptoStore } from '@/stores/crypto'
-import { formatDate } from '@/utils/formatDate';
-import { formatPrice } from '@/utils/formatPrice';
+import { formatDate } from '@/utils/formatDate'
+import { formatPrice } from '@/utils/formatPrice'
+import { useDisplay } from 'vuetify'
 
 interface Props {
   coinId: string
 }
-
+const { mobile } = useDisplay()
 const props = defineProps<Props>()
 const cryptoStore = useCryptoStore()
 const coinData = computed(() => cryptoStore.coinDetails)
+const legendConfig = computed(() => ({
+  position: mobile.value ? ('bottom' as const) : ('right' as const),
+}))
+
+const chartSize = computed(() => {
+  if (mobile.value) return 250
+  return 280
+})
 const chartData = computed(() => {
   if (!coinData.value?.market_data) return []
 
@@ -66,22 +75,22 @@ const priceMetrics = computed(() => {
 
 <template>
   <v-card elevation="2" rounded="xl" class="pa-2">
-    <v-card-title class="d-flex align-center gap-2">
+    <v-card-title class="flex align-center gap-2">
       <v-icon>mdi-chart-pie</v-icon>
       Price Analysis
     </v-card-title>
 
-    <v-card-text>
+    <v-card-text class="d-flex flex-column align-center">
       <div v-if="chartData.length > 0 && priceMetrics">
-        <div class="text-center mb-6">
+        <div class="d-flex justify-center mb-6">
           <v-pie
             :items="chartData"
-            :legend="{ position: 'right' }"
+            :legend="legendConfig"
             :tooltip="{
               subtitleFormat: (s) => `${s.value.toFixed(1)}% of total range`,
             }"
             inner-cut="60"
-            size="280"
+            :size="chartSize"
             :animation="{ duration: 1000, easing: 'easeInOutQuad' }"
             hide-slice
           >
